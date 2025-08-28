@@ -10,7 +10,7 @@ import venv
 
 def create_venv(parent_path: Path) -> Path:
     venv_path = parent_path / "package-smoke-test"
-    venv.create(venv_path, with_pip=True)
+    venv.EnvBuilder(with_pip=True).create(venv_path)
     subprocess.run(
         [venv_path / "bin" / "pip", "install", "-U", "pip", "setuptools"], check=True
     )
