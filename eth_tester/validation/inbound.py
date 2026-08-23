@@ -60,8 +60,7 @@ def is_topic(value):
 
 def validate_32_byte_hex_value(value, name):
     error_message = (
-        "{} must be a hexadecimal encoded 32 byte string.  Got: "
-        "{}".format(name, value)
+        f"{name} must be a hexadecimal encoded 32 byte string.  Got: {value}"
     )
     if not is_32byte_hex_string(value):
         raise ValidationError(error_message)
@@ -75,17 +74,14 @@ def validate_timestamp(value):
 
     if value >= MAX_TIMESTAMP:
         raise ValidationError(
-            "Timestamp values must be less than {}.  Got {}".format(
-                MAX_TIMESTAMP,
-                value,
-            )
+            f"Timestamp values must be less than {MAX_TIMESTAMP}.  Got {value}"
         )
 
 
 def validate_block_number(value):
     error_message = (
         "Block number must be a positive integer or one of the strings "
-        "'latest', 'earliest', or 'pending'.  Got: {}".format(value)
+        f"'latest', 'earliest', or 'pending'.  Got: {value}"
     )
     if is_string(value):
         validate_text(value)
@@ -122,7 +118,7 @@ def validate_inbound_storage_slot(value):
     try:
         int_val = int(value, 16)
     except ValueError:
-        raise ValidationError(error_msg)
+        raise ValidationError(error_msg) from None
 
     validate_uint256(int_val)
 
@@ -302,8 +298,9 @@ def validate_transaction(value, txn_internal_type):
 
     if "data" in value:
         bad_data_message = (
-            "Transaction 'data' must be a hexadecimal encoded string.  Got: "
-            "{}".format(value["data"])
+            "Transaction 'data' must be a hexadecimal encoded string.  Got: {}".format(
+                value["data"]
+            )
         )
         if not is_text(value["data"]):
             raise ValidationError(bad_data_message)
@@ -316,7 +313,7 @@ def validate_transaction(value, txn_internal_type):
         except (binascii.Error, TypeError):
             # TypeError is for python2
             # binascii.Error is for python3
-            raise ValidationError(bad_data_message)
+            raise ValidationError(bad_data_message) from None
 
     if "access_list" in value:
         _validate_inbound_access_list(value["access_list"])
@@ -337,15 +334,15 @@ def _validate_inbound_access_list(access_list):
 
     >>> _access_list = (
     ...     {
-    ...         'address': '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae',
-    ...         'storage_keys': (
-    ...             '0x0000000000000000000000000000000000000000000000000000000000000003',  # noqa: E501
-    ...             '0x0000000000000000000000000000000000000000000000000000000000000007',  # noqa: E501
-    ...         )
+    ...         "address": "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
+    ...         "storage_keys": (
+    ...             "0x0000000000000000000000000000000000000000000000000000000000000003",  # noqa: E501
+    ...             "0x0000000000000000000000000000000000000000000000000000000000000007",  # noqa: E501
+    ...         ),
     ...     },
     ...     {
-    ...         'address': '0xbb9bc244d798123fde783fcc1c72d3bb8c189413',
-    ...         'storage_keys': ()
+    ...         "address": "0xbb9bc244d798123fde783fcc1c72d3bb8c189413",
+    ...         "storage_keys": (),
     ...     },
     ... )
     """
@@ -382,16 +379,14 @@ def _validate_inbound_authorization_list(authorization_list) -> None:
     for auth in authorization_list:
         if not is_dict(auth):
             raise ValidationError(
-                "authorization_list entry must be a dictionary.  Got: {}".format(
-                    type(auth)
-                )
+                f"authorization_list entry must be a dictionary.  Got: {type(auth)}"
             )
         if not all(
             k in auth for k in ("address", "nonce", "chain_id", "y_parity", "r", "s")
         ):
             raise ValidationError(
                 "authorization must be signed, containing keys: "
-                "chain_id, address, nonce, y_parity, r, s.  Got: {}".format(auth.keys())
+                f"chain_id, address, nonce, y_parity, r, s.  Got: {auth.keys()}"
             )
         validate_address(auth["address"])
         validate_uint64(auth["nonce"])
@@ -405,7 +400,7 @@ def validate_raw_transaction(raw_transaction):
     if not is_text(raw_transaction) or not is_hex(raw_transaction):
         raise ValidationError(
             "Raw Transaction must be a hexadecimal encoded string.  Got: "
-            "{}".format(raw_transaction)
+            f"{raw_transaction}"
         )
 
 

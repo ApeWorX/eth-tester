@@ -191,7 +191,7 @@ class MockBackend(BaseChainBackend):
             try:
                 block = self.blocks[block_number]
             except IndexError:
-                raise BlockNotFound(f"No block found for #{block_number}")
+                raise BlockNotFound(f"No block found for #{block_number}") from None
         else:
             raise Exception(
                 f"Invariant.  Unrecognized block number format: {block_number}"
@@ -251,7 +251,7 @@ class MockBackend(BaseChainBackend):
         except KeyError:
             raise TransactionNotFound(
                 f"No transaction found for hash: {transaction_hash}"
-            )
+            ) from None
         transaction, block, transaction_index = self._get_transaction_by_hash(
             transaction_hash
         )

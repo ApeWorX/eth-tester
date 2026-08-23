@@ -13,18 +13,16 @@ def import_string(dotted_path):
     try:
         module_path, class_name = dotted_path.rsplit(".", 1)
     except ValueError:
-        msg = "%s doesn't look like a module path" % dotted_path
-        raise ImportError(msg)
+        msg = f"{dotted_path} doesn't look like a module path"
+        raise ImportError(msg) from None
 
     module = import_module(module_path)
 
     try:
         return getattr(module, class_name)
     except AttributeError:
-        msg = 'Module "{}" does not define a "{}" attribute/class'.format(
-            module_path, class_name
-        )
-        raise ImportError(msg)
+        msg = f'Module "{module_path}" does not define a "{class_name}" attribute/class'
+        raise ImportError(msg) from None
 
 
 def get_import_path(obj):

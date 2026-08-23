@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - uses: astral-sh/setup-uv@v7
+
+    - name: Build Package
+      run: uv build
+
+    - name: Publish Package
+      uses: pypa/gh-action-pypi-publish@release/v1

@@ -30,9 +30,7 @@ from eth_tester.exceptions import (
 
 
 def validate_positive_integer(value):
-    error_message = "Value must be a positive integer.  Got: {}".format(
-        value,
-    )
+    error_message = f"Value must be a positive integer.  Got: {value}"
     if not is_integer(value):
         raise ValidationError(error_message)
     elif value < 0:
@@ -87,9 +85,8 @@ def validate_any(value, validators):
     errors = _accumulate_errors(value, validators)
     if len(errors) == len(validators):
         item_error_messages = tuple(f" - [{idx}]: {str(err)}" for idx, err in errors)
-        error_message = (
-            "Value did not pass any of the provided validators:\n"
-            "{}".format("\n".join(item_error_messages))
+        error_message = "Value did not pass any of the provided validators:\n{}".format(
+            "\n".join(item_error_messages)
         )
         raise ValidationError(error_message)
 
@@ -136,7 +133,7 @@ def validate_dict(value, key_validators):
         key_messages = tuple(
             f"{key}: {str(err)}" for key, err in sorted(key_errors.items())
         )
-        error_message = "The following keys failed to validate\n" "- {}".format(
+        error_message = "The following keys failed to validate\n- {}".format(
             "\n - ".join(key_messages)
         )
         raise ValidationError(error_message)
@@ -159,7 +156,7 @@ def validate_array(value, validator):
         item_messages = tuple(
             f"[{index}]: {str(err)}" for index, err in sorted(item_errors)
         )
-        error_message = "The following items failed to validate\n" "- {}".format(
+        error_message = "The following items failed to validate\n- {}".format(
             "\n - ".join(item_messages)
         )
         raise ValidationError(error_message)

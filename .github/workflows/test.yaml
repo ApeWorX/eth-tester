@@ -1,0 +1,74 @@
+name: Test
+
+on: ["push", "pull_request"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        python-version: "3.10"
+    - name: Run Ruff Lint
+      run: uv run --group lint ruff check .
+    - name: Run Ruff Format
+      run: uv run --group lint ruff format --check .
+    - name: Run mdformat
+      run: uv run --group lint mdformat --check *.md
+
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        python-version: "3.10"
+    - name: Run MyPy
+      run: uv run --group lint --group test mypy -p eth_tester
+
+  core:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Run Core Tests
+      run: uv run --group test pytest tests/core
+
+  pyevm:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Run PyEVM Tests
+      run: uv run --group test --extra py-evm pytest tests/backends/test_pyevm.py

@@ -1,5 +1,5 @@
 import pytest
-
+import rlp
 from eth_keys import (
     keys,
 )
@@ -17,7 +17,6 @@ from eth_utils.toolz import (
     dissoc,
     merge,
 )
-import rlp
 
 from eth_tester.constants import (
     BURN_ADDRESS,

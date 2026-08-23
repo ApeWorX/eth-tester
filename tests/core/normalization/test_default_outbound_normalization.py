@@ -34,9 +34,9 @@ def test_outbound_receipt_contract_address_status_based_normalization(
 @pytest.mark.parametrize(
     "value,expected",
     (
-        (0, f"0x{'00'*32}"),
-        (1, f"0x{'00'*31}01"),
-        (2, f"0x{'00'*31}02"),
+        (0, f"0x{'00' * 32}"),
+        (1, f"0x{'00' * 31}01"),
+        (2, f"0x{'00' * 31}02"),
     ),
 )
 def test_outbound_storage_normalization(value, expected):

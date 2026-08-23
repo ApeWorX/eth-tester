@@ -133,7 +133,7 @@ def check_if_log_matches_flat_topics(log_topics, filter_topics):
     else:
         return all(
             check_single_topic_match(left, right)
-            for left, right in zip(log_topics, filter_topics)
+            for left, right in zip(log_topics, filter_topics, strict=False)
         )
 
 
