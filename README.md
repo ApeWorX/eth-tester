@@ -108,7 +108,7 @@ python -m pip install eth-tester
 The ethereum tester library strictly enforces the following input formats and
 types.
 
-- Hexadecimal values **must** be text (not byte) strings.  The `0x` prefix is optional.
+- Hexadecimal values **must** be text (not byte) strings. The `0x` prefix is optional.
 - Any address which contains mixed-case alpha characters will be validated as a checksummed address as specified by [EIP-55](https://github.com/ethereum/ercs/blob/master/ERCS/erc-55.md)
 - 32-byte hashes **must** be hexadecimal encoded.
 - Numeric values **must** be in their integer representation.
@@ -141,14 +141,14 @@ Any `block_number` parameter will accept the following string values.
 
 - `eth_tester.EthereumTester(backend=None, validator=None, normalizer=None, auto_mine_transactions=True, fork_blocks=None)`
 
-The `EthereumTester` object is the sole API entrypoint.  Instantiation of this
+The `EthereumTester` object is the sole API entrypoint. Instantiation of this
 object accepts the following parameters.
 
-- `backend`: The chain backend being used.  See the [chain backends](#backends)
-- `validator`: The validator being used.  See the [validators](#validation)
-- `normalizer`: The normalizer being used.  See the [normalizers](#normalization)
-- `auto_mine_transactions`: If *truthy* transactions will be automatically mined at the time they are submitted.  See [`enable_auto_mine_transactions`](#api-enable_auto_mine_transactions) and [`disable_auto_mine_transactions`](#api-disable_auto_mine_transactions).
-- `fork_blocks`: configures which block numbers the various network hard fork rules will be activated.  See [fork-rules](#fork-rules)
+- `backend`: The chain backend being used. See the [chain backends](#backends)
+- `validator`: The validator being used. See the [validators](#validation)
+- `normalizer`: The normalizer being used. See the [normalizers](#normalization)
+- `auto_mine_transactions`: If *truthy* transactions will be automatically mined at the time they are submitted. See [`enable_auto_mine_transactions`](#api-enable_auto_mine_transactions) and [`disable_auto_mine_transactions`](#api-disable_auto_mine_transactions).
+- `fork_blocks`: configures which block numbers the various network hard fork rules will be activated. See [fork-rules](#fork-rules)
 
 ```python
 >>> from eth_tester import EthereumTester
@@ -180,7 +180,7 @@ of the latest block.
 
 ### Mining
 
-Manually mining blocks can be done with the following API.  The `coinbase`
+Manually mining blocks can be done with the following API. The `coinbase`
 parameter of these methods **must** be a hexadecimal encoded address.
 
 <a id="api-mine_blocks"></a>
@@ -199,7 +199,7 @@ Mines a single new block, returning the mined block's hash.
 
 #### Auto-mining transactions
 
-By default, all transactions are mined immediately.  This means that each transaction you send will result in a new block being mined, and that all blocks will only ever have at most a single transaction.  This behavior can be controlled with the following methods.
+By default, all transactions are mined immediately. This means that each transaction you send will result in a new block being mined, and that all blocks will only ever have at most a single transaction. This behavior can be controlled with the following methods.
 
 <a id="api-enable_auto_mine_transactions"></a>
 
@@ -215,13 +215,13 @@ Turns **off** auto-mining of transactions.
 
 ### Accounts
 
-The following API can be used to interact with account data.  The `account`
+The following API can be used to interact with account data. The `account`
 parameter in these methods **must** be a hexadecimal encoded address.
 
 <a id="api-get_accounts"></a>
 `EthereumTester.get_accounts()`
 
-Returns an iterable of the accounts that the tester knows about.  All accounts
+Returns an iterable of the accounts that the tester knows about. All accounts
 in this list will be EIP55 checksummed.
 
 ```python
@@ -236,7 +236,7 @@ in this list will be EIP55 checksummed.
 
 #### `EthereumTester.add_account(private_key, password=None)`
 
-Adds a new account for the given private key.  Returns the hex encoded address
+Adds a new account for the given private key. Returns the hex encoded address
 of the added account.
 
 ```python
@@ -244,7 +244,7 @@ of the added account.
 '0xdc544d1aa88ff8bbd2f2aec754b1f1e99e1812fd'
 ```
 
-By default, added accounts are unlocked and do not have a password.  If you
+By default, added accounts are unlocked and do not have a password. If you
 would like to add an account which has a password, you can supply the password
 as the second parameter.
 
@@ -269,7 +269,7 @@ Raises a `ValidationError` if:
 >>> t.unlock_account('0xdc544d1aa88ff8bbd2f2aec754b1f1e99e1812fd', 'my-secret')
 ```
 
-By default, accounts will be unlocked indefinitely.  You can however unlock an
+By default, accounts will be unlocked indefinitely. You can however unlock an
 account for a specified amount of time by providing the desired duration in
 seconds.
 
@@ -361,8 +361,8 @@ transaction cannot be found.
 
 #### `EthereumTester.get_block_by_number(block_number, full_transactions=False) -> block-object`
 
-Returns the block for the given `block_number`.  See [block
-numbers](#block-numbers) for named block numbers you can use.  If
+Returns the block for the given `block_number`. See [block
+numbers](#block-numbers) for named block numbers you can use. If
 `full_transactions` is truthy, then the transactions array will be populated
 with full transaction objects as opposed to their hashes.
 
@@ -398,7 +398,7 @@ cannot be found.
 
 #### `EthereumTester.get_block_by_hash(block_hash, full_transactions=True) -> block-object`
 
-Returns the block for the given `block_hash`.  The `full_transactions`
+Returns the block for the given `block_hash`. The `full_transactions`
 parameter behaves the same as in
 [`get_block_by_number`](#api-get_block_by_number).
 
@@ -469,7 +469,7 @@ A transaction is a formatted as a dictionary with the following keys and
 values.
 
 - `from`: The address of the account sending the transaction (hexadecimal string).
-- `to`: The address of the account the transaction is being sent to.  Empty string should be used to trigger contract creation (hexadecimal string).
+- `to`: The address of the account the transaction is being sent to. Empty string should be used to trigger contract creation (hexadecimal string).
 - `gas`: Sets the gas limit for transaction execution (integer).
 - `value`: The amount of ether in wei that should be sent with the transaction (integer).
 - `data`: The data for the transaction (hexadecimal string).
@@ -532,7 +532,7 @@ Note that specifying `reward_percentiles` has no effect on the response and so `
 
 #### `EthereumTester.create_block_filter() -> integer`
 
-Creates a new filter for newly mined blocks.  Returns the `filter_id` which can
+Creates a new filter for newly mined blocks. Returns the `filter_id` which can
 be used to retrieve the block hashes for the mined blocks.
 
 ```python
@@ -559,7 +559,7 @@ be used to retrieve the block hashes for the mined blocks.
 
 #### `EthereumTester.create_pending_transaction_filter() -> integer`
 
-Creates a new filter for pending transactions.  Returns the `filter_id` which
+Creates a new filter for pending transactions. Returns the `filter_id` which
 can be used to retrieve the transaction hashes for the pending transactions.
 
 ```python
@@ -585,7 +585,7 @@ can be used to retrieve the transaction hashes for the pending transactions.
 
 #### `EthereumTester.create_log_filter(from_block=None, to_block=None, address=None, topics=None) -> integer`
 
-Creates a new filter for logs produced by transactions.  The parameters for
+Creates a new filter for logs produced by transactions. The parameters for
 this function can be used to filter the log entries.
 
 ```python
@@ -621,7 +621,7 @@ this function can be used to filter the log entries.
 
 #### `EthereumTester.delete_filter(filter_id)`
 
-Removes the filter for the provided `filter_id`.  If no filter is found for the
+Removes the filter for the provided `filter_id`. If no filter is found for the
 given `filter_id`, raises [`FilterNotFound`](#errors-FilterNotFound).
 
 <a id="api-get_only_filter_changes"></a>
@@ -629,7 +629,7 @@ given `filter_id`, raises [`FilterNotFound`](#errors-FilterNotFound).
 #### `EthereumTester.get_only_filter_changes(filter_id) -> transaction_hash or block_hash or log_entry`
 
 Returns all new values for the provided `filter_id` that have not previously
-been returned through this API.  Raises
+been returned through this API. Raises
 [`FilterNotFound`](#errors-FilterNotFound) if no filter is found for the given
 `filter_id`.
 
@@ -691,7 +691,7 @@ Ethereum tester is written using a pluggable backend system.
 ### Backend Dependencies
 
 Ethereum tester does not install any of the dependencies needed to use the
-various backends by default.  You can however install ethereum tester with the
+various backends by default. You can however install ethereum tester with the
 necessary dependencies using the following method.
 
 ```bash
@@ -699,7 +699,7 @@ $ python -m pip install eth-tester[<backend-name>]
 ```
 
 You should replace `<backend-name>` with the name of the desired testing
-backend.  Available backends are:
+backend. Available backends are:
 
 - `py-evm`: [PyEVM (alpha)](https://pypi.python.org/pypi/py-evm) **(experimental)**
 
@@ -716,7 +716,7 @@ use.
 ```
 
 Ethereum tester also supports configuration using the environment variable
-`ETHEREUM_TESTER_CHAIN_BACKEND`.  This should be set to the import path for the
+`ETHEREUM_TESTER_CHAIN_BACKEND`. This should be set to the import path for the
 backend class you wish to use.
 
 ### Available Backends
@@ -728,7 +728,7 @@ Ethereum tester can be used with the following backends.
 
 #### MockBackend
 
-This backend has limited functionality.  It cannot perform any VM computations.
+This backend has limited functionality. It cannot perform any VM computations.
 It mocks out all of the objects and interactions.
 
 ```python
@@ -750,7 +750,7 @@ Uses the experimental Py-EVM library.
 #### PyEVM Genesis Parameters and State
 
 If you need to specify custom genesis parameters and state, you can build your own parameters `dict` to use instead of the default
-when initializing a backend.  Only default values can be overridden or a `ValueError` will be raised.
+when initializing a backend. Only default values can be overridden or a `ValueError` will be raised.
 
 ```
 # Default Genesis Parameters
@@ -887,16 +887,16 @@ The normal format is intended for use by end users.
 
 ## Normalization and Validation
 
-> Beware! Here there be dragons...  This section of the documentation is only
+> Beware! Here there be dragons... This section of the documentation is only
 > relevant if you intend to build tooling on top of this library.
 
 The ethereum tester provides strong guarantees that backends can be swapped out
 seamlessly without affecting the data formats of both the input arguments and
-return values.  This is accomplished using a two-step process of strict
+return values. This is accomplished using a two-step process of strict
 *normalization* and *validation*.
 
 All inputs to the methods of the `EthereumTester` are first validated then
-normalized to a *canonical* format.  Return values are put through this process
+normalized to a *canonical* format. Return values are put through this process
 as well, first validating the data returned by the backend, and then
 normalizing it from the *canonical* format to the *normal* form before being
 returned.
@@ -906,7 +906,7 @@ returned.
 ### Normalization
 
 The `EthereumTester` delegates normalization to whatever `normalizer` was
-passed in during instantiation.  If no value was provided, the default
+passed in during instantiation. If no value was provided, the default
 normalizer will be used from
 `eth_tester.normalization.default.DefaultNormalizer`.
 
@@ -917,7 +917,7 @@ The specifics of this object are beyond the scope of this document.
 ### Validation
 
 The `EthereumTester` delegates validation to whatever `validator` was
-passed in during instantiation.  If no value was provided, the default
+passed in during instantiation. If no value was provided, the default
 validator will be used from
 `eth_tester.validation.default.DefaultValidator`.
 
@@ -939,43 +939,28 @@ for information on how we do:
 - Pull Requests
 - Documentation
 
-We use [pre-commit](https://pre-commit.com/) to maintain consistent code style. Once
+We use [prek](https://prek.j178.dev) to maintain consistent code style. Once
 installed, it will run automatically with every commit. You can also run it manually
-with `make lint`. If you need to make a commit that skips the `pre-commit` checks, you
+with `uv run prek run --all-files`. If you need to make a commit that skips the `prek` checks, you
 can do so with `git commit --no-verify`.
 
 ### Development Environment Setup
 
-You can set up your dev environment with:
+You can set up your dev environment with the `dev` dependency group, which is
+installed by default when you run `uv sync`.
 
 ```sh
-git clone git@github.com:ethereum/eth-tester.git
+git clone git@github.com:ApeWorX/eth-tester.git
 cd eth-tester
-virtualenv -p python3 venv
-. venv/bin/activate
-python -m pip install -e ".[dev]"
-pre-commit install
+uv sync --all-extras
+uv run prek install
 ```
 
 ### Release setup
 
 To release a new version:
 
-```sh
-make release bump=$$VERSION_PART_TO_BUMP$$
-```
-
-#### How to bumpversion
-
-The version format for this repo is `{major}.{minor}.{patch}` for stable, and
-`{major}.{minor}.{patch}-{stage}.{devnum}` for unstable (`stage` can be alpha or beta).
-
-To issue the next version in line, specify which part to bump,
-like `make release bump=minor` or `make release bump=devnum`. This is typically done from the
-main branch, except when releasing a beta (in which case the beta is released from main,
-and the previous stable branch is released from said branch).
-
-If you are in a beta version, `make release bump=stage` will switch to a stable.
-
-To issue an unstable version when the current version is stable, specify the
-new version explicitly, like `make release bump="--new-version 4.0.0-alpha.1 devnum"`
+1. Create a GitHub Release with the desired tag, for example `v0.13.0-beta.2`.
+2. GitHub Actions builds the package from that tag.
+3. `setuptools-scm` derives the package version from the release tag.
+4. The release workflow publishes to PyPI through trusted publishing.

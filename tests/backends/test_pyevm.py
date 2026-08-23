@@ -1,5 +1,4 @@
 import pytest
-
 from eth.constants import (
     POST_MERGE_DIFFICULTY,
     POST_MERGE_MIX_HASH,
@@ -26,6 +25,8 @@ from eth_typing import (
 )
 from eth_utils import (
     ValidationError as EthUtilsValidationError,
+)
+from eth_utils import (
     encode_hex,
     is_hexstr,
     to_bytes,
@@ -199,9 +200,7 @@ def test_apply_withdrawals():
     )
     # withdrawal amounts are in gwei, balance is measured in wei
     assert backend.get_balance(b"\x01" * 20) == 100 * 10**9  # 100 gwei
-    assert (
-        backend.get_balance(b"\x02" * 20) == (2**64 - 1) * 10**9
-    )  # 2**64 - 1 gwei
+    assert backend.get_balance(b"\x02" * 20) == (2**64 - 1) * 10**9  # 2**64 - 1 gwei
 
     assert (
         mined_block["withdrawals_root"]
@@ -444,9 +443,9 @@ class TestPyEVMBackendDirect(BaseTestBackendDirect):
         assert len(accounts) == 3
 
         for acct in accounts:
-            assert tester.get_storage_at(acct, HexStr("0x0")) == f"0x{'00'*32}"
-            assert tester.get_storage_at(acct, HexStr("0x1")) == f"0x{'00'*31}01"
-            assert tester.get_storage_at(acct, HexStr("0x2")) == f"0x{'00'*31}02"
+            assert tester.get_storage_at(acct, HexStr("0x0")) == f"0x{'00' * 32}"
+            assert tester.get_storage_at(acct, HexStr("0x1")) == f"0x{'00' * 31}01"
+            assert tester.get_storage_at(acct, HexStr("0x2")) == f"0x{'00' * 31}02"
 
     # --- cancun network upgrade --- #
 
@@ -495,9 +494,7 @@ class TestPyEVMBackendDirect(BaseTestBackendDirect):
 
         blob_data = (
             b"\x00" * 32 * (4096 - len(self.ENCODED_BLOB_TEXT) // 32)
-        ) + self.ENCODED_BLOB_TEXT[
-            :-1
-        ]  # only 1 byte short -- invalid
+        ) + self.ENCODED_BLOB_TEXT[:-1]  # only 1 byte short -- invalid
 
         with pytest.raises(EthUtilsValidationError):
             acct.sign_transaction(tx, blobs=[blob_data])
@@ -561,8 +558,7 @@ class TestPyEVMBackendDirect(BaseTestBackendDirect):
         assert eth_tester.get_transaction_by_hash(tx_hash)
         assert eth_tester.get_code(acct.address) == (
             # assert set to delegation prefix + contract address (0xef0001...)
-            "0xef0100"
-            + contract_addr[2:]
+            "0xef0100" + contract_addr[2:]
         )
         assert (
             # assert set `1` at storage slot `0`

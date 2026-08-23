@@ -209,7 +209,7 @@ class EthereumTester:
         try:
             account_password = self._account_passwords[raw_account]
         except KeyError:
-            raise ValidationError("Unknown account")
+            raise ValidationError("Unknown account") from None
 
         if account_password is None:
             raise ValidationError("Account does not have a password")
@@ -567,7 +567,7 @@ class EthereumTester:
         try:
             snapshot = self._snapshots[snapshot_id]
         except KeyError:
-            raise SnapshotNotFound(f"No snapshot found for id: {snapshot_id}")
+            raise SnapshotNotFound(f"No snapshot found for id: {snapshot_id}") from None
         else:
             self.backend.revert_to_snapshot(snapshot)
 

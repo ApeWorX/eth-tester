@@ -79,7 +79,11 @@ if is_supported_pyevm_version_available():
     )
     from eth.exceptions import (
         HeaderNotFound as EVMHeaderNotFound,
+    )
+    from eth.exceptions import (
         InvalidInstruction as EVMInvalidInstruction,
+    )
+    from eth.exceptions import (
         Revert as EVMRevert,
     )
     from eth.vm.forks import (
@@ -331,9 +335,7 @@ def _get_transaction_by_hash(chain, transaction_hash):
                 return block, transaction, index
     else:
         raise TransactionNotFound(
-            "No transaction found for transaction hash: {}".format(
-                encode_hex(transaction_hash)
-            )
+            f"No transaction found for transaction hash: {encode_hex(transaction_hash)}"
         )
 
 
@@ -669,9 +671,10 @@ class PyEVMBackend(BaseChainBackend):
             if key in ("from", "type"):
                 continue
             if key == "v" and is_typed_transaction:
-                yield "y_parity", transaction[
-                    "v"
-                ]  # use y_parity for typed txns, internally
+                yield (
+                    "y_parity",
+                    transaction["v"],
+                )  # use y_parity for typed txns, internally
                 continue
             yield key, transaction[key]
 

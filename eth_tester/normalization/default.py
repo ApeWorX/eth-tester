@@ -16,17 +16,35 @@ from .common import (
 )
 from .inbound import (
     normalize_filter_params as normalize_inbound_filter_params,
+)
+from .inbound import (
     normalize_log_entry as normalize_inbound_log_entry,
+)
+from .inbound import (
     normalize_private_key as normalize_inbound_private_key,
+)
+from .inbound import (
     normalize_raw_transaction as normalize_inbound_raw_transaction,
+)
+from .inbound import (
     normalize_transaction as normalize_inbound_transaction,
 )
 from .outbound import (
     normalize_account as normalize_outbound_account,
+)
+from .outbound import (
     normalize_account_list as normalize_outbound_account_list,
+)
+from .outbound import (
     normalize_block as normalize_outbound_block,
+)
+from .outbound import (
     normalize_log_entry as normalize_outbound_log_entry,
+)
+from .outbound import (
     normalize_receipt as normalize_outbound_receipt,
+)
+from .outbound import (
     normalize_transaction as normalize_outbound_transaction,
 )
 

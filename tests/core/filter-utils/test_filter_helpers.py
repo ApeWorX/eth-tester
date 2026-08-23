@@ -1,5 +1,4 @@
 import pytest
-
 from eth_utils import (
     big_endian_to_int,
     is_list_like,
@@ -442,7 +441,7 @@ def _make_log(block_number=10, topics=None, address=ADDRESS_A, _type="mined", **
         topics=topics or tuple(),
         address=address,
         type=_type,
-        **kwargs
+        **kwargs,
     )
 
 

@@ -141,12 +141,18 @@ def _fill_transaction(
 
     if is_dynamic_fee_transaction:
         # dynamic fee transaction (type = 2)
-        yield "max_fee_per_gas", overrides.get(
-            "max_fee_per_gas", transaction.get("max_fee_per_gas", 1000000000)
+        yield (
+            "max_fee_per_gas",
+            overrides.get(
+                "max_fee_per_gas", transaction.get("max_fee_per_gas", 1000000000)
+            ),
         )
-        yield "max_priority_fee_per_gas", overrides.get(
+        yield (
             "max_priority_fee_per_gas",
-            transaction.get("max_priority_fee_per_gas", 1000000000),
+            overrides.get(
+                "max_priority_fee_per_gas",
+                transaction.get("max_priority_fee_per_gas", 1000000000),
+            ),
         )
         yield from _yield_typed_transaction_fields(overrides, transaction)
 
@@ -158,11 +164,13 @@ def _fill_transaction(
 
 
 def _yield_typed_transaction_fields(overrides, transaction):
-    yield "chain_id", overrides.get(
-        "chain_id", transaction.get("chain_id", 131277322940537)
+    yield (
+        "chain_id",
+        overrides.get("chain_id", transaction.get("chain_id", 131277322940537)),
     )
-    yield "access_list", overrides.get(
-        "access_list", transaction.get("access_list", ())
+    yield (
+        "access_list",
+        overrides.get("access_list", transaction.get("access_list", ())),
     )
 
 
