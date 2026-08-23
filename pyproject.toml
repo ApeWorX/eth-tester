@@ -29,7 +29,6 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "coincurve>=20.0.0,<21; python_version == '3.14'",
     "eth-abi>=6",
     "eth-account>=0.14",
     "eth-keys>=0.5",
