@@ -158,6 +158,9 @@ class EthereumTester:
         self._snapshot_counter = itertools.count()
         self._snapshots = {}
 
+        # pending transactions
+        self._pending_transactions = []
+
         # raw accounts
         self._account_passwords = {}
         self._account_unlock = collections.defaultdict(bool)
