@@ -511,7 +511,10 @@ class PyEVMBackend(BaseChainBackend):
     #
     def time_travel(self, to_timestamp):
         # timestamp adjusted by 1 b/c a second is added in mine_blocks
-        self.chain.header = self.chain.header.copy(timestamp=(to_timestamp - 1))
+        header = self.chain.header.copy(timestamp=(to_timestamp - 1))
+        # Reject invalid headers before replacing the pending chain state.
+        self.chain.get_vm().validate_header(header, self.chain.get_canonical_head())
+        self.chain.header = header
         self.mine_blocks()
         return to_timestamp
 

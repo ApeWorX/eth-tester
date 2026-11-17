@@ -628,3 +628,51 @@ class TestPyEVMBackendDirect(BaseTestBackendDirect):
         )
 
         assert result == "0x"
+
+
+@pytest.mark.parametrize("vm_class", [FrontierVM, LondonVM, ParisVM, PragueVM])
+@pytest.mark.parametrize("offset", [0, -1, -100])
+@pytest.mark.parametrize("mined_blocks", [0, 2])
+def test_failed_backend_time_travel_preserves_pending_header(
+    vm_class, offset, mined_blocks
+):
+    backend = PyEVMBackend(vm_configuration=((0, vm_class),))
+    backend.mine_blocks(mined_blocks)
+    pending = backend.chain.header
+    canonical = backend.chain.get_canonical_head()
+
+    with pytest.raises(EthUtilsValidationError):
+        backend.time_travel(canonical.timestamp + 1 + offset)
+
+    assert backend.chain.header == pending
+    assert backend.chain.get_canonical_head() == canonical
+    target = pending.timestamp + 120
+    assert backend.time_travel(target) == target
+    assert backend.get_block_by_number("pending")["timestamp"] == target
+    assert backend.chain.get_canonical_head().block_number == canonical.block_number + 1
+
+
+def test_failed_backend_time_travel_preserves_pending_transaction():
+    backend = PyEVMBackend()
+    sender, recipient = backend.get_accounts()[:2]
+    transaction_hash = backend.send_transaction(
+        {
+            "from": sender,
+            "to": recipient,
+            "gas": 21000,
+            "value": 1,
+            "max_fee_per_gas": 10**9,
+            "max_priority_fee_per_gas": 10**9,
+        }
+    )
+    pending = backend.get_block_by_number("pending")
+    sender_nonce = backend.get_nonce(sender, "pending")
+
+    with pytest.raises(EthUtilsValidationError):
+        backend.time_travel(backend.chain.get_canonical_head().timestamp + 1)
+
+    assert backend.get_block_by_number("pending") == pending
+    assert backend.get_nonce(sender, "pending") == sender_nonce
+    backend.time_travel(pending["timestamp"] + 120)
+    transactions = backend.get_block_by_number("latest")["transactions"]
+    assert [tx["hash"] for tx in transactions] == [transaction_hash]
