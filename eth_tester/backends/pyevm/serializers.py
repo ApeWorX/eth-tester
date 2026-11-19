@@ -261,6 +261,7 @@ def serialize_transaction_receipt(
             )
             for log_index, log in enumerate(receipt.logs)
         ],
+        "logs_bloom": receipt.bloom,
         "state_root": state_root,
         "status": to_int(state_root),
         "to": transaction.to,

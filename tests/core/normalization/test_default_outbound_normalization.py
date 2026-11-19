@@ -41,3 +41,10 @@ def test_outbound_receipt_contract_address_status_based_normalization(
 )
 def test_outbound_storage_normalization(value, expected):
     assert DefaultNormalizer.normalize_outbound_storage(value) == expected
+
+
+@pytest.mark.parametrize("bloom", [0, 1, 1 << 2047, 2**2048 - 1])
+def test_outbound_receipt_preserves_logs_bloom(bloom):
+    receipt = make_receipt(logs_bloom=bloom)
+    normalized = DefaultNormalizer.normalize_outbound_receipt(receipt)
+    assert normalized["logs_bloom"] == bloom

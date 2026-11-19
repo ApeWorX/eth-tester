@@ -230,6 +230,7 @@ def make_receipt(transaction, block, _transaction_index, overrides=None):
     gas_used = overrides.get("gas_used", 21000)
     yield "gas_used", gas_used
     yield "logs", overrides.get("logs", [])
+    yield "logs_bloom", overrides.get("logs_bloom", 0)
     yield "transaction_hash", overrides.get("transaction_hash", transaction.get("hash"))
     yield (
         "cumulative_gas_used",

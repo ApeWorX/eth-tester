@@ -225,6 +225,7 @@ RECEIPT_NORMALIZERS = {
     "gas_used": identity,
     "contract_address": identity,  # special case, see ``_normalize_contract_address()``
     "logs": partial(normalize_array, normalizer=normalize_log_entry),
+    "logs_bloom": identity,
     "state_root": identity,
     "status": identity,
     "to": to_empty_or_checksum_address,
