@@ -628,3 +628,41 @@ class TestPyEVMBackendDirect(BaseTestBackendDirect):
         )
 
         assert result == "0x"
+
+
+@pytest.mark.parametrize("pre_london_vm", (FrontierVM, BerlinVM))
+@pytest.mark.parametrize("fork_block", (1, 3))
+@pytest.mark.parametrize("gas_limit", (30029122, 4750000))
+def test_mine_across_london_transition(pre_london_vm, fork_block, gas_limit):
+    backend = PyEVMBackend(
+        genesis_parameters=get_default_genesis_params(
+            overrides={"gas_limit": gas_limit, "difficulty": GENESIS_DIFFICULTY}
+        ),
+        vm_configuration=((0, pre_london_vm), (fork_block, LondonVM)),
+    )
+    tester = EthereumTester(backend=backend)
+    tester.mine_blocks(fork_block + 2)
+
+    limits = [
+        tester.get_block_by_number(number)["gas_limit"]
+        for number in range(fork_block + 3)
+    ]
+    assert limits == [gas_limit] * fork_block + [gas_limit * 2] * 3
+    assert tester.get_block_by_number("pending")["gas_limit"] == gas_limit * 2
+
+
+@pytest.mark.parametrize("gas_limit", (30029122, 4750000))
+def test_london_genesis_does_not_expand_again_at_later_fork(gas_limit):
+    backend = PyEVMBackend(
+        genesis_parameters=get_default_genesis_params(
+            overrides={"gas_limit": gas_limit, "difficulty": GENESIS_DIFFICULTY}
+        ),
+        vm_configuration=((0, LondonVM), (3, ParisVM)),
+    )
+    tester = EthereumTester(backend=backend)
+    tester.mine_blocks(5)
+
+    assert [tester.get_block_by_number(number)["gas_limit"] for number in range(6)] == [
+        gas_limit
+    ] * 6
+    assert tester.get_block_by_number("pending")["gas_limit"] == gas_limit

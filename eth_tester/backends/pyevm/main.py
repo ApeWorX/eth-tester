@@ -234,6 +234,9 @@ def setup_tester_chain(
     from eth.db import (
         get_db_backend,
     )
+    from eth.vm.forks import (
+        LondonVM,
+    )
 
     if vm_configuration is None:
         vm_config = ((0, PragueVM),)
@@ -253,10 +256,21 @@ def setup_tester_chain(
         vm_configuration = vm_config
 
         def create_header_from_parent(self, parent_header, **header_params):
-            # Keep the gas limit constant
+            vm_class = self.get_vm_class_for_block_number(
+                parent_header.block_number + 1
+            )
+            is_london_transition = not hasattr(
+                parent_header, "base_fee_per_gas"
+            ) and issubclass(vm_class, LondonVM)
+            # Let the VM expand the gas limit at the London fork, then keep
+            # the new limit constant as on all other blocks.
+            if not is_london_transition:
+                header_params = assoc(
+                    header_params, "gas_limit", parent_header.gas_limit
+                )
             return super().create_header_from_parent(
                 parent_header,
-                **assoc(header_params, "gas_limit", parent_header.gas_limit),
+                **header_params,
             )
 
         def get_transaction_builder(self):
