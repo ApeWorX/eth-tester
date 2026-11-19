@@ -69,6 +69,72 @@ ZERO_ADDRESS_HEX = "0x0000000000000000000000000000000000000000"
 MNEMONIC = "test test test test test test test test test test test junk"
 
 
+@pytest.mark.parametrize("chain_id", [0, 1, 1337, 2**64 + 1, 2**256 - 1])
+def test_configured_chain_id_reaches_evm(chain_id):
+    contract_address = b"\x11" * 20
+    genesis_state = PyEVMBackend.generate_genesis_state()
+    genesis_state[contract_address] = {
+        "balance": 0,
+        "nonce": 0,
+        # CHAINID; MSTORE(0); RETURN(0, 32)
+        "code": bytes.fromhex("4660005260206000f3"),
+        "storage": {},
+    }
+    backend = PyEVMBackend(genesis_state=genesis_state, chain_id=chain_id)
+    tester = EthereumTester(backend=backend)
+    result = tester.call(
+        {
+            "from": tester.get_accounts()[0],
+            "to": encode_hex(contract_address),
+            "gas": 100_000,
+        }
+    )
+    assert int(result, 16) == chain_id
+
+
+def test_configured_chain_id_used_for_default_typed_transaction():
+    tester = EthereumTester(backend=PyEVMBackend(chain_id=1337))
+    accounts = tester.get_accounts()
+    tx_hash = tester.send_transaction(
+        {"from": accounts[0], "to": accounts[1], "gas": 21_000, "value": 1}
+    )
+    transaction = tester.get_transaction_by_hash(tx_hash)
+    assert transaction["chain_id"] == 1337
+
+
+def test_configured_chain_id_survives_reset_to_genesis():
+    tester = EthereumTester(backend=PyEVMBackend(chain_id=1337))
+    tester.mine_blocks(2)
+    tester.reset_to_genesis()
+    assert tester.backend.chain.chain_id == 1337
+    assert tester.get_block_by_number("latest")["number"] == 0
+
+
+def test_configured_chain_ids_are_independent():
+    first = PyEVMBackend(chain_id=1)
+    second = PyEVMBackend(chain_id=1337)
+    default = PyEVMBackend()
+    assert first.chain.chain_id == 1
+    assert second.chain.chain_id == 1337
+    assert default.chain.chain_id == 131277322940537
+
+
+def test_configured_chain_id_from_mnemonic():
+    backend = PyEVMBackend.from_mnemonic(MNEMONIC, chain_id=1337)
+    assert backend.chain.chain_id == 1337
+
+
+def test_setup_tester_chain_configured_chain_id():
+    _, chain = setup_tester_chain(chain_id=1337)
+    assert chain.chain_id == 1337
+
+
+@pytest.mark.parametrize("chain_id", [-1, 2**256, True, False, 1.5, "1", None])
+def test_configured_chain_id_rejects_invalid_values(chain_id):
+    with pytest.raises(EthUtilsValidationError):
+        PyEVMBackend(chain_id=chain_id)
+
+
 @pytest.fixture
 def eth_tester():
     if not is_supported_pyevm_version_available():

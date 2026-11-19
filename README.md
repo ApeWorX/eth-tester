@@ -747,6 +747,24 @@ Uses the experimental Py-EVM library.
 >>> t = EthereumTester(PyEVMBackend())
 ```
 
+#### PyEVM Chain ID
+
+Pass `chain_id` to configure the ID used by the EVM's `CHAINID` opcode and by
+transactions that do not specify their own chain ID:
+
+```python
+>>> backend = PyEVMBackend(chain_id=1337)
+>>> t = EthereumTester(backend=backend)
+>>> backend.chain.chain_id
+1337
+```
+
+The default remains `131277322940537`. The value must be an integer from `0` to
+`2**256 - 1`; it is retained when the backend resets to genesis. This option is
+also available on `PyEVMBackend.from_mnemonic()`. Chain ID is a backend option,
+not a genesis header parameter. JSON-RPC adapters have their own `eth_chainId`
+handling and must report the same ID separately.
+
 #### PyEVM Genesis Parameters and State
 
 If you need to specify custom genesis parameters and state, you can build your own parameters `dict` to use instead of the default
