@@ -245,7 +245,8 @@ class BaseTestBackendDirect:
                 "latest",
                 [],
                 {
-                    "base_fee_per_gas": [300657803, 343608917, 392695905],
+                    "oldest_block": 8,
+                    "base_fee_per_gas": [343608917, 300657803, 263075578, 230191131],
                     "gas_used_ratio": [0.0, 0.0, 0.0],
                     "reward": [],
                 },
@@ -255,7 +256,8 @@ class BaseTestBackendDirect:
                 "safe",
                 [],
                 {
-                    "base_fee_per_gas": [300657803],
+                    "oldest_block": 10,
+                    "base_fee_per_gas": [263075578, 230191131],
                     "gas_used_ratio": [0.0],
                     "reward": [],
                 },
@@ -265,7 +267,8 @@ class BaseTestBackendDirect:
                 "finalized",
                 [],
                 {
-                    "base_fee_per_gas": [300657803],
+                    "oldest_block": 10,
+                    "base_fee_per_gas": [263075578, 230191131],
                     "gas_used_ratio": [0.0],
                     "reward": [],
                 },
@@ -275,8 +278,9 @@ class BaseTestBackendDirect:
                 "earliest",
                 [],
                 {
-                    "base_fee_per_gas": [],
-                    "gas_used_ratio": [],
+                    "oldest_block": 0,
+                    "base_fee_per_gas": [1000000000, 875000000],
+                    "gas_used_ratio": [0.0],
                     "reward": [],
                 },
             ],
@@ -285,7 +289,8 @@ class BaseTestBackendDirect:
                 "pending",
                 [],
                 {
-                    "base_fee_per_gas": [300657803],
+                    "oldest_block": 10,
+                    "base_fee_per_gas": [263075578, 230191131],
                     "gas_used_ratio": [0.0],
                     "reward": [],
                 },
@@ -302,10 +307,7 @@ class BaseTestBackendDirect:
             block_count, newest_block, reward_percentiles
         )
 
-        assert fee_history["oldest_block"] == 1
-        assert fee_history["base_fee_per_gas"] == expected["base_fee_per_gas"]
-        assert fee_history["gas_used_ratio"] == expected["gas_used_ratio"]
-        assert fee_history["reward"] == expected["reward"]
+        assert fee_history == expected
 
     @pytest.mark.parametrize(
         "block_count,newest_block,reward_percentiles,error,message",
