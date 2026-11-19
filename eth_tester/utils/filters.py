@@ -162,7 +162,9 @@ def check_if_address_match(address, addresses):
     if addresses is None:
         return True
     if is_tuple(addresses):
-        return any(is_same_address(address, item) for item in addresses)
+        return not addresses or any(
+            is_same_address(address, item) for item in addresses
+        )
     elif is_address(addresses):
         return is_same_address(addresses, address)
     else:
