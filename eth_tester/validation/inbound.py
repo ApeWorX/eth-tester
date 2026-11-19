@@ -143,11 +143,6 @@ def validate_filter_params(from_block, to_block, address, topics):
     if address is None:
         pass
     elif is_list_like(address):
-        if not address:
-            raise ValidationError(
-                "Address must be either a single hexadecimal encoded address or "
-                "a non-empty list of hexadecimal encoded addresses"
-            )
         for sub_address in address:
             validate_account(sub_address)
     elif not is_hex_address(address):

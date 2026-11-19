@@ -1698,6 +1698,56 @@ class BaseTestBackendDirect:
         with pytest.raises(ValidationError):
             eth_tester.create_log_filter(from_block=0, topics=filter_topics)
 
+    @pytest.mark.parametrize("addresses", ([], ()))
+    @pytest.mark.parametrize(
+        "constraint",
+        ("none", "matching_topic", "wrong_topic", "from_block", "to_block"),
+    )
+    def test_empty_address_filter_matches_all_emitters(
+        self, eth_tester, addresses, constraint
+    ):
+        self.skip_if_no_evm_execution()
+
+        emitters = [_deploy_emitter(eth_tester) for _ in range(2)]
+        old_hash = _call_emitter(
+            eth_tester,
+            emitters[0],
+            "logSingle",
+            [EMITTER_ENUM["LogSingleWithIndex"], 1],
+        )
+        old_logs = eth_tester.get_transaction_receipt(old_hash)["logs"]
+        params = {"from_block": 0}
+        if constraint == "matching_topic":
+            params["topics"] = [old_logs[0]["topics"][0]]
+        elif constraint == "wrong_topic":
+            params["topics"] = ["0x" + "00" * 32]
+        elif constraint == "from_block":
+            params["from_block"] = old_logs[0]["block_number"] + 1
+        elif constraint == "to_block":
+            params["to_block"] = old_logs[0]["block_number"]
+
+        filter_id = eth_tester.create_log_filter(address=addresses, **params)
+        new_hash = _call_emitter(
+            eth_tester,
+            emitters[1],
+            "logSingle",
+            [EMITTER_ENUM["LogSingleWithIndex"], 2],
+        )
+        new_logs = eth_tester.get_transaction_receipt(new_hash)["logs"]
+        if constraint == "wrong_topic":
+            expected = ()
+        elif constraint == "from_block":
+            expected = tuple(new_logs)
+        elif constraint == "to_block":
+            expected = tuple(old_logs)
+        else:
+            expected = tuple(old_logs + new_logs)
+
+        assert eth_tester.get_logs(address=addresses, **params) == expected
+        assert eth_tester.get_all_filter_logs(filter_id) == expected
+        assert eth_tester.get_only_filter_changes(filter_id) == expected
+        assert eth_tester.get_only_filter_changes(filter_id) == ()
+
     def test_log_filter_includes_old_logs(self, eth_tester):
         """
         Cases to test:
