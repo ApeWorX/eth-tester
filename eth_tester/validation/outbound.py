@@ -253,6 +253,7 @@ RECEIPT_VALIDATORS = {
     "gas_used": validate_positive_integer,
     "contract_address": if_not_null(validate_canonical_address),
     "logs": partial(validate_array, validator=validate_log_entry),
+    "logs_bloom": validate_logs_bloom,
     "state_root": validate_bytes,
     "status": validate_status,
     "to": if_not_create_address(validate_canonical_address),

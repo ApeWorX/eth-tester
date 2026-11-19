@@ -97,6 +97,7 @@ python -m pip install eth-tester
  'effective_gas_price': 1000000000,
  'contract_address': None,
  'logs': (),
+ 'logs_bloom': 0,
  'type': '0x2',
  'status': 1}
 ```
@@ -462,6 +463,9 @@ found for the given hash.
 
 - Receipts for unmined transactions will have all of `block_hash`, `block_number` and `transaction_index` set to `None`.
 - Receipts for transactions which create a contract will have the created contract address in the `contract_address` field.
+- `logs_bloom` is the transaction's bloom filter as a nonnegative 2048-bit integer,
+  using the same representation as the block field. It is zero for receipts with
+  no logs. Custom backends must include it in their raw receipt dictionaries.
 
 ### Transaction Sending
 

@@ -29,6 +29,7 @@ def make_receipt(
     status=0,
     to=ZERO_ADDRESS,
     _type="0x0",
+    logs_bloom=0,
 ):
     yield from yield_key_value_if_value_not_none("transaction_hash", transaction_hash)
     yield from yield_key_value_if_value_not_none("transaction_index", transaction_index)
@@ -47,6 +48,7 @@ def make_receipt(
     yield from yield_key_value_if_value_not_none("state_root", state_root)
     yield from yield_key_value_if_value_not_none("status", status)
     yield from yield_key_value_if_value_not_none("logs", logs or [])
+    yield from yield_key_value_if_value_not_none("logs_bloom", logs_bloom)
     yield from yield_key_value_if_value_not_none("contract_address", contract_address)
     yield from yield_key_value_if_value_not_none("blob_gas_used", blob_gas_used)
     yield from yield_key_value_if_value_not_none("blob_gas_price", blob_gas_price)
