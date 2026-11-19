@@ -609,18 +609,23 @@ class PyEVMBackend(BaseChainBackend):
         block = self.get_block_by_number(newest_block)
         block_header = self.chain.get_canonical_block_header_by_number(block["number"])
 
-        ancestors = self.chain.get_ancestors(block_count, header=block_header)
+        # get_ancestors excludes its header. Start from the next header to include
+        # newest_block and derive the additional base fee without mining a block.
+        next_header = self.chain.create_header_from_parent(block_header)
+        ancestors = self.chain.get_ancestors(block_count, header=next_header)
 
         base_fee_per_gas = []
         gas_used_ratio = []
         reward = []  # always return empty reward array for now
 
-        for ancestor in ancestors:
-            base_fee_per_gas.append(ancestor.header.base_fee_per_gas)
+        for ancestor in reversed(ancestors):
+            base_fee_per_gas.append(getattr(ancestor.header, "base_fee_per_gas", 0))
             gas_used_ratio.append(ancestor.header.gas_used / ancestor.header.gas_limit)
 
+        base_fee_per_gas.append(getattr(next_header, "base_fee_per_gas", 0))
+
         return {
-            "oldest_block": 1,
+            "oldest_block": block_header.block_number - len(ancestors) + 1,
             "base_fee_per_gas": base_fee_per_gas,
             "gas_used_ratio": gas_used_ratio,
             "reward": reward,

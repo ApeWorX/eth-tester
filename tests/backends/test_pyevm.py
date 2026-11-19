@@ -628,3 +628,75 @@ class TestPyEVMBackendDirect(BaseTestBackendDirect):
         )
 
         assert result == "0x"
+
+
+@pytest.mark.parametrize(
+    "mined_blocks,block_count,newest_block,oldest,count",
+    [
+        (0, 1, "latest", 0, 1),
+        (3, 1, "latest", 3, 1),
+        (4, 3, "latest", 2, 3),
+        (4, 2, 3, 2, 2),
+        (2, 10, "latest", 0, 3),
+        (4, 1, "earliest", 0, 1),
+        (4, 2, "safe", 3, 2),
+        (4, 2, "finalized", 3, 2),
+        (4, 2, "pending", 3, 2),
+    ],
+)
+def test_fee_history_range_and_next_base_fee(
+    eth_tester, mined_blocks, block_count, newest_block, oldest, count
+):
+    eth_tester.mine_blocks(mined_blocks)
+    latest = eth_tester.get_block_by_number("latest")
+    blocks = [eth_tester.get_block_by_number(n) for n in range(oldest, oldest + count)]
+    next_number = oldest + count
+    next_block = eth_tester.get_block_by_number(
+        next_number if next_number <= latest["number"] else "pending"
+    )
+
+    history = eth_tester.get_fee_history(block_count, newest_block)
+
+    assert history == {
+        "oldest_block": oldest,
+        "base_fee_per_gas": [b["base_fee_per_gas"] for b in blocks]
+        + [next_block["base_fee_per_gas"]],
+        "gas_used_ratio": [b["gas_used"] / b["gas_limit"] for b in blocks],
+        "reward": [],
+    }
+    assert eth_tester.get_block_by_number("latest") == latest
+
+
+def test_fee_history_gas_ratios_follow_chronological_blocks(eth_tester):
+    sender, receiver = eth_tester.get_accounts()[:2]
+    eth_tester.send_transaction(
+        {"from": sender, "to": receiver, "gas": 21000, "value": 1}
+    )
+    eth_tester.mine_blocks(2)
+    blocks = [eth_tester.get_block_by_number(n) for n in (1, 2, 3)]
+    history = eth_tester.get_fee_history(3, "latest")
+    assert history == {
+        "oldest_block": 1,
+        "base_fee_per_gas": [b["base_fee_per_gas"] for b in blocks]
+        + [eth_tester.get_block_by_number("pending")["base_fee_per_gas"]],
+        "gas_used_ratio": [b["gas_used"] / b["gas_limit"] for b in blocks],
+        "reward": [],
+    }
+    assert history["gas_used_ratio"][0] > 0
+
+
+@pytest.mark.parametrize(
+    "vm_configuration,next_base_fee",
+    [
+        (((0, BerlinVM),), 0),
+        (((0, BerlinVM), (1, LondonVM)), 1000000000),
+    ],
+)
+def test_fee_history_pre_london_and_london_transition(vm_configuration, next_base_fee):
+    tester = EthereumTester(backend=PyEVMBackend(vm_configuration=vm_configuration))
+    assert tester.get_fee_history(1, "earliest") == {
+        "oldest_block": 0,
+        "base_fee_per_gas": [0, next_base_fee],
+        "gas_used_ratio": [0.0],
+        "reward": [],
+    }
