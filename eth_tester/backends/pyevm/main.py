@@ -116,6 +116,7 @@ else:
 ZERO_ADDRESS = 20 * b"\x00"
 ZERO_HASH32 = 32 * b"\x00"
 EIP838_SIG = b"\x08\xc3y\xa0"
+DEFAULT_CHAIN_ID = 131277322940537
 
 EMPTY_RLP_LIST_HASH = b"\x1d\xccM\xe8\xde\xc7]z\xab\x85\xb5g\xb6\xcc\xd4\x1a\xd3\x12E\x1b\x94\x8at\x13\xf0\xa1B\xfd@\xd4\x93G"  # noqa: E501
 BLANK_ROOT_HASH = b"V\xe8\x1f\x17\x1b\xccU\xa6\xff\x83E\xe6\x92\xc0\xf8n\x5bH\xe0\x1b\x99l\xad\xc0\x01b/\xb5\xe3c\xb4!"  # noqa: E501
@@ -223,6 +224,7 @@ def setup_tester_chain(
     mnemonic=None,
     hd_path=None,
     genesis_is_post_merge=True,
+    chain_id=DEFAULT_CHAIN_ID,
 ):
     from eth.chains.base import (
         MiningChain,
@@ -234,6 +236,11 @@ def setup_tester_chain(
     from eth.db import (
         get_db_backend,
     )
+    from eth.validation import (
+        validate_uint256,
+    )
+
+    validate_uint256(chain_id, title="Chain ID")
 
     if vm_configuration is None:
         vm_config = ((0, PragueVM),)
@@ -249,7 +256,6 @@ def setup_tester_chain(
         # TODO: Once the logic within `MiningChain` is refactored more generally in
         #  py-evm, change this class inheritance to reflect that since a `PosConsensus`
         #  chain does not mine.
-        chain_id = 131277322940537
         vm_configuration = vm_config
 
         def create_header_from_parent(self, parent_header, **header_params):
@@ -285,7 +291,8 @@ def setup_tester_chain(
 
     base_db = get_db_backend()
 
-    chain = MainnetTesterPosChain.from_genesis(base_db, genesis_params, genesis_state)
+    chain_class = MainnetTesterPosChain.configure(chain_id=chain_id)
+    chain = chain_class.from_genesis(base_db, genesis_params, genesis_state)
     return account_keys, chain
 
 
@@ -365,6 +372,7 @@ class PyEVMBackend(BaseChainBackend):
         vm_configuration=None,
         mnemonic=None,
         hd_path=None,
+        chain_id=DEFAULT_CHAIN_ID,
     ):
         """
         :param genesis_parameters: A dict of chain parameters for overriding default
@@ -375,6 +383,7 @@ class PyEVMBackend(BaseChainBackend):
             schedule as used in py-evm's :attr:`eth.chains.base.Chain.vm_configuration`.
             (at author time, a series of block numbers and virtual machines)
         :param mnemonic: A mnemonic str to use when generating accounts.
+        :param chain_id: An unsigned 256-bit chain ID, retained across genesis resets.
         """
         if not is_supported_pyevm_version_available():
             raise BackendDistributionNotFound(
@@ -383,6 +392,7 @@ class PyEVMBackend(BaseChainBackend):
                 "Please install or update the `py-evm` library."
             )
 
+        self._chain_id = chain_id
         self.account_keys = None  # set below
         accounts = len(genesis_state) if genesis_state else None
         self.reset_to_genesis(
@@ -403,6 +413,7 @@ class PyEVMBackend(BaseChainBackend):
         genesis_parameters=None,
         vm_configuration=None,
         hd_path=None,
+        chain_id=DEFAULT_CHAIN_ID,
     ):
         """
         Create a genesis state pre-populated with accounts. A number of accounts can be
@@ -422,6 +433,7 @@ class PyEVMBackend(BaseChainBackend):
             vm_configuration=vm_configuration,
             mnemonic=mnemonic,
             hd_path=hd_path,
+            chain_id=chain_id,
         )
 
     #
@@ -478,6 +490,7 @@ class PyEVMBackend(BaseChainBackend):
             vm_configuration,
             mnemonic,
             hd_path,
+            chain_id=self._chain_id,
         )
 
     #
